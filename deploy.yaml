@@ -1,0 +1,119 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: service-c
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: service-c
+        version: v1
+        tier: backend
+    spec:
+      volumes:
+      - name: application-config
+        configMap:
+          name: spring-boot-samples
+          items:
+          - key: hello.message
+            path: application.properties
+            mode: 511
+      - name: consul-data
+      containers:
+      - name: service-c
+        image: hariinfo/samples:service-a
+        volumeMounts:
+        - name: application-config
+          mountPath: "/deployments/config_service_a"
+          readOnly: false
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always
+        env:
+        - name: HELLO_MESSAGE
+          valueFrom:
+            configMapKeyRef:
+              name: spring-boot-samples
+              key: hello.message
+      - name: consul
+        image: consul:latest
+        volumeMounts:
+        - name: consul-data
+          mountPath: "/consul/data"
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        args:
+        - agent
+        - -ui
+        - -advertise=$(POD_IP)
+        - -bind=0.0.0.0
+        - -bootstrap-expect=1
+        - -client=0.0.0.0
+        - -domain=cluster.local
+        - -server
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - consul
+              - leave
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-c
+  labels:
+    app: service-c
+    tier: backend
+    version: v1
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 8080
+  selector:
+    app: service-c
+    tier: backend
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gateway-sb-demo
+  annotations:
+    kubernetes.io/ingress.class: "istio"
+  labels:
+    sb-demo: sb-demo-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: service-c
+          servicePort: 8080
+      - path: /chaining
+        backend:
+          serviceName: service-c
+          servicePort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul
+  labels:
+    app: consul
+    tier: backend
+    version: v1
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 8500
+  selector:
+    app: service-c
+    tier: backend
+---
