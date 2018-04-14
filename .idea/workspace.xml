@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="12e9ae8d-0747-4ee5-a43c-5d90cfdcf42b" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/deploy.yaml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/resources/bootstrap.properties" />
-    </list>
+    <list default="true" id="12e9ae8d-0747-4ee5-a43c-5d90cfdcf42b" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
