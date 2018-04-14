@@ -22,7 +22,7 @@ spec:
       - name: consul-data
       containers:
       - name: service-c
-        image: hariinfo/samples:service-a
+        image: hariinfo/samples:service-c
         volumeMounts:
         - name: application-config
           mountPath: "/deployments/config_service_a"

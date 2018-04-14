@@ -1,0 +1,15 @@
+spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      config:
+        fail-fast: false
+    config:
+      enabled: true
+      prefix: configuration
+      defaultContext: apps
+      profileSeparator: '::'
+      fail-fast: false
+  application:
+    name: consulAppSample
