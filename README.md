@@ -6,7 +6,17 @@ This tutorial will walk you through the following
 * Consul agent will connect with 3 node consul server
 * Access consul UI for administration
 
-kubectl port-forward consul-0 8500:8500
+```
+------- POD 1 --------------------    ------- POD 2 ----------------------
+                                 |   |   Consul server 0 (Leader)         |
+                                 |    ------------------------------------
+                                 |    --------- POD 3 --------------------  
+Spring Boot App -> Consul Agent  | ->|   Consul server 1                  |
+(container 1)      (container 2) |    ------------------------------------
+                                 |    -------- POD 4 ---------------------       
+                                 |   |   Consul server 2                  |
+----------------------------------    ------------------------------------
+```
 
 ## Deploy microservice and consul agent
 ```
