@@ -46,15 +46,14 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         args:
         - agent
-        - -ui
         - -advertise=$(POD_IP)
-        - -bind=0.0.0.0
-        - -bootstrap-expect=1
-        - -client=0.0.0.0
-        - -domain=cluster.local
-        - -server
+        - -retry-join=consul.$(NAMESPACE).svc.cluster.local
         lifecycle:
           preStop:
             exec:
@@ -75,44 +74,6 @@ spec:
   ports:
   - name: http
     port: 8080
-  selector:
-    app: service-c
-    tier: backend
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: gateway-sb-demo
-  annotations:
-    kubernetes.io/ingress.class: "istio"
-  labels:
-    sb-demo: sb-demo-ingress
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        backend:
-          serviceName: service-c
-          servicePort: 8080
-      - path: /chaining
-        backend:
-          serviceName: service-c
-          servicePort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: consul
-  labels:
-    app: consul
-    tier: backend
-    version: v1
-spec:
-  type: LoadBalancer
-  ports:
-  - name: http
-    port: 8500
   selector:
     app: service-c
     tier: backend
